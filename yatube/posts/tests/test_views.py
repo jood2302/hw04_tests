@@ -126,6 +126,7 @@ class TaskPagesTests(TestCase):
         post_text = first_object.text
         self.assertFalse(response.context['page_obj'].has_next())
 
+
 class PaginatorTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='Test_user')
