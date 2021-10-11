@@ -1,28 +1,44 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post, User
+from posts.models import Post, Group
+
+User = get_user_model()
 
 
-class PostModelTest(TestCase):
+class TestGroupModel(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.user = User.objects.create_user(username='auth')
+        cls.group_title = 'Group_test'
         cls.group = Group.objects.create(
-            title='Тестовая группа',
-            slug='Тестовый слаг',
-            description='Тестовое описание',
+            title=cls.group_title,
+            slug='Ntcn',
+            description='Тестовый текст.'
         )
-        cls.post = Post.objects.create(
-            author=cls.user,
+
+    def test_object_name_is_title_group(cls):
+        group = Group.objects.all().first()
+        expected_object_name = group.title
+        cls.assertEqual(expected_object_name, str(cls.group_title),
+                        '__str__ работает неверно')
+
+
+class TestPostModel(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        user = User.objects.create(username='Test',
+                                   last_name='User',
+                                   email='test@user.net',
+                                   password='Test_User')
+        cls.task = Post.objects.create(
+            author=user,
             text='Тестовый текст',
         )
 
-    def test_models_have_correct_object_names(self):
-        """Проверяем, что у моделей корректно работает __str__."""
-        self.assertEqual(self.post.text[:15], str(self.post))
-        self.assertEqual(self.post.verbose_name, str(self.post))
-        self.assertEqual(self.post.help_text, str(self.post))
-        self.assertEqual(self.group.title, str(self.group))
-        self.assertEqual(self.group.verbose_name, str(self.group))
-        self.assertEqual(self.group.help_text, str(self.group))
+    def test_object_text_long(self):
+        task = Post.objects.all().first()
+        expected_object_name = task.text[:15]
+        self.assertEqual(expected_object_name, str(task),
+                         'Не проходит по ограничению поста в 15 символов')
