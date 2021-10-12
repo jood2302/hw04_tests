@@ -66,7 +66,7 @@ class StaticURLTests(TestCase):
 
     def test_new_post_unauth_user_redirect_login(self):
         response = self.guest_client.get(self.private_create_post_url,
-                                         follow = True)
+                                         follow=True)
         self.assertRedirects(response, self.public_create_post_url)
 
     def test_post_edit_no_auth(self):
@@ -88,7 +88,7 @@ class StaticURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         for url, template in self.templates_url_names.items():
-            with self.subTest(url = url):
+            with self.subTest(url=url):
                 response = self.authorized_client.get(url)
 
                 self.assertTemplateUsed(response, template)

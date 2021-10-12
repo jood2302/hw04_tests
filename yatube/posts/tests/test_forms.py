@@ -18,21 +18,21 @@ class PostFormTest(TestCase):
         super().setUpClass()
         settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.form = PostForm()
-        cls.user = User.objects.create_user(username = 'test_user')
+        cls.user = User.objects.create_user(username='test_user')
         cls.group = Group.objects.create(
-            title = 'Тест группа',
-            slug = 'testgroup',
-            description = 'Тест описание',
+            title='Тест группа',
+            slug='testgroup',
+            description='Тест описание',
         )
         cls.new_group = Group.objects.create(
-            title = 'Тест группа1',
-            slug = 'newtestgroup',
-            description = 'Тест группа',
+            title='Тест группа1',
+            slug='newtestgroup',
+            description='Тест группа',
         )
         cls.post = Post.objects.create(
-            text = 'Тестовый текст',
-            author = cls.user,
-            group = cls.group,
+            text='Тестовый текст',
+            author=cls.user,
+            group=cls.group,
         )
 
     @classmethod

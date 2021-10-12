@@ -41,7 +41,7 @@ class TaskPagesTests(TestCase):
         templates_pages_names = {
             self.public_index_template: reverse('posts:index'),
             self.public_profile: reverse('posts:profile',
-                                         kwargs = {'username': 'test_user'}),
+                                         kwargs={'username': 'test_user'}),
             self.public_post: reverse('posts:post_detail',
                                       kwargs={'post_id': '1'}),
             self.private_edit_post_template: reverse('posts:post_edit',
@@ -53,7 +53,7 @@ class TaskPagesTests(TestCase):
             ),
         }
         for template, reverse_name in templates_pages_names.items():
-            with self.subTest(reverse_name = reverse_name):
+            with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
         response = self.authorized_client.get(reverse('posts:post_create'))
@@ -63,11 +63,11 @@ class TaskPagesTests(TestCase):
         url_names = [reverse('posts:index'),
                      reverse('posts:post_detail', kwargs={'post_id': '2'}),
                      reverse('posts:post_edit',
-                             kwargs = {'post_id': '2'}),
+                             kwargs={'post_id': '2'}),
                      reverse('posts:group_list',
-                             kwargs = {'slug': self.group.slug}),
+                             kwargs={'slug': self.group.slug}),
                      reverse('posts:profile',
-                             kwargs = {'username': self.user.username})]
+                             kwargs={'username': self.user.username})]
         for url in url_names:
             response = self.authorized_client.get(url)
             self.assertContains(response, self.form_data['text'])
@@ -76,19 +76,19 @@ class TaskPagesTests(TestCase):
 
     def test_check_post_in_group(self):
         t_group = Group.objects.create(
-            title = 'Заголовок',
-            slug = 'test',
-            description = 'Текст',
+            title='Заголовок',
+            slug='test',
+            description='Текст',
         )
         Group.objects.create(
-            title = 'Заголовок1',
-            slug = 'test1',
-            description = 'Текст1',
+            title='Заголовок1',
+            slug='test1',
+            description='Текст1',
         )
         Post.objects.create(
-            text = 'Тестовый текст',
-            author = self.user,
-            group = t_group,
+            text='Тестовый текст',
+            author=self.user,
+            group=t_group,
         )
         response = self.authorized_client.get(
             reverse('posts:group_list', kwargs={'slug': 'test'}))
