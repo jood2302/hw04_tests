@@ -35,6 +35,9 @@ class Post(models.Model):
         help_text="Выберите название группы"
     )
 
+    def __str__(self) -> str:
+        return self.text
+
     class Meta:
         ordering = ['-pub_date']
         default_related_name = 'posts'

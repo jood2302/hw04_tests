@@ -27,7 +27,7 @@ class StaticURLTests(TestCase):
         self.public_group_page_url = '/group/testslug/'
         self.private_create_post_url = '/create/'
         self.public_create_post_url = '/auth/login/?next=/create/'
-        self.public_test_username = '/profile/author/'
+        self.public_test_username = '/profile/test_user/'
         self.public_test_id_post = '/posts/1/'
         self.private_test_username_post_edit = '/posts/1/edit/'
         self.templates_url_names = {
@@ -37,7 +37,7 @@ class StaticURLTests(TestCase):
                 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
             '/posts/1/': 'posts/post_detail.html',
-            '/profile/author/': 'posts/profile.html'
+            '/profile/test_user/': 'posts/profile.html'
         }
         self.url_list_for_guest = [self.public_index_url,
                                    self.public_group_page_url,
@@ -52,14 +52,12 @@ class StaticURLTests(TestCase):
         for url in self.url_list_for_guest:
             with self.subTest(url=url):
                 response = self.guest_client.get(url)
-
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_URls_for_auth(self):
         for url in self.url_list_for_auth:
             with self.subTest(url=url):
                 response = self.authorized_client.get(url)
-
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_unexisting_page(self):
@@ -68,7 +66,7 @@ class StaticURLTests(TestCase):
 
     def test_new_post_unauth_user_redirect_login(self):
         response = self.guest_client.get(self.private_create_post_url,
-                                         follow=True)
+                                         follow = True)
         self.assertRedirects(response, self.public_create_post_url)
 
     def test_post_edit_no_auth(self):
@@ -90,7 +88,7 @@ class StaticURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         for url, template in self.templates_url_names.items():
-            with self.subTest(url=url):
+            with self.subTest(url = url):
                 response = self.authorized_client.get(url)
 
                 self.assertTemplateUsed(response, template)

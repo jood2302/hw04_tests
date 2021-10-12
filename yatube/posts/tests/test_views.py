@@ -14,7 +14,7 @@ class TaskPagesTests(TestCase):
         self.authorized_client.force_login(self.user)
         self.group = Group.objects.create(
             title='Тест',
-            slug='7897987',
+            slug='12',
         )
         self.post = Post.objects.create(
             text='Тестовый текст',
@@ -22,7 +22,7 @@ class TaskPagesTests(TestCase):
             group=self.group
         )
         self.form_data = {
-            'text': 'formtesttext',
+            'text': 'Тестовый текст',
             'group': self.group.id,
         }
         self.new_post = self.authorized_client.post(
@@ -38,11 +38,10 @@ class TaskPagesTests(TestCase):
         self.public_post = 'posts/post_detail.html'
 
     def test_pages_use_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
         templates_pages_names = {
             self.public_index_template: reverse('posts:index'),
             self.public_profile: reverse('posts:profile',
-                                         kwargs={'username': 'AntonKarpov'}),
+                                         kwargs = {'username': 'test_user'}),
             self.public_post: reverse('posts:post_detail',
                                       kwargs={'post_id': '1'}),
             self.private_edit_post_template: reverse('posts:post_edit',
@@ -50,11 +49,11 @@ class TaskPagesTests(TestCase):
                                                              '1'}),
             self.private_create_post_template: reverse('posts:post_create'),
             self.public_group_page_template: (
-                reverse('posts:group_list', kwargs={'slug': '7897987'})
+                reverse('posts:group_list', kwargs={'slug': '12'})
             ),
         }
         for template, reverse_name in templates_pages_names.items():
-            with self.subTest(reverse_name=reverse_name):
+            with self.subTest(reverse_name = reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
         response = self.authorized_client.get(reverse('posts:post_create'))
@@ -64,11 +63,11 @@ class TaskPagesTests(TestCase):
         url_names = [reverse('posts:index'),
                      reverse('posts:post_detail', kwargs={'post_id': '2'}),
                      reverse('posts:post_edit',
-                             kwargs={'post_id': '2'}),
+                             kwargs = {'post_id': '2'}),
                      reverse('posts:group_list',
-                             kwargs={'slug': self.group.slug}),
+                             kwargs = {'slug': self.group.slug}),
                      reverse('posts:profile',
-                             kwargs={'username': self.user.username})]
+                             kwargs = {'username': self.user.username})]
         for url in url_names:
             response = self.authorized_client.get(url)
             self.assertContains(response, self.form_data['text'])
@@ -77,19 +76,19 @@ class TaskPagesTests(TestCase):
 
     def test_check_post_in_group(self):
         t_group = Group.objects.create(
-            title='Заголовок',
-            slug='test',
-            description='Текст',
+            title = 'Заголовок',
+            slug = 'test',
+            description = 'Текст',
         )
         Group.objects.create(
-            title='Заголовок1',
-            slug='test1',
-            description='Текст1',
+            title = 'Заголовок1',
+            slug = 'test1',
+            description = 'Текст1',
         )
         Post.objects.create(
-            text='formtesttext',
-            author=self.user,
-            group=t_group
+            text = 'Тестовый текст',
+            author = self.user,
+            group = t_group,
         )
         response = self.authorized_client.get(
             reverse('posts:group_list', kwargs={'slug': 'test'}))
@@ -99,7 +98,7 @@ class TaskPagesTests(TestCase):
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
         post_group = first_object.group
-        self.assertEqual(post_text, 'formtesttext')
+        self.assertEqual(post_text, 'Тестовый текст')
         self.assertEqual(post_group.title, 'Заголовок')
         response = self.authorized_client.get(
             reverse('posts:group_list', kwargs={'slug': 'test1'})
@@ -111,55 +110,79 @@ class TaskPagesTests(TestCase):
             reverse('posts:index'))
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
-        self.assertEqual(post_text, 'formtesttext')
+        self.assertEqual(post_text, 'Тестовый текст')
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
         self.assertFalse(response.context['page_obj'].has_next())
 
     def test_chech_post_in_profile(self):
         response = self.authorized_client.get(
-            reverse('posts:profile'))
+            reverse('posts:profile', kwargs={
+                'username': self.user.username,
+            }))
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
-        self.assertEqual(post_text, 'formtesttext')
+        self.assertEqual(post_text, 'Тестовый текст')
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
         self.assertFalse(response.context['page_obj'].has_next())
 
 
 class PaginatorTests(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(username='Test_user')
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)
-        for i in range(0, 13):
-            Post.objects.create(
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='test_user')
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test-slug',
+            description='Тестовая группа',
+        )
+
+        cls.post = 13
+        for cls.post in range(13):
+            cls.post = Post.objects.create(
                 text='Тестовый текст',
-                author=self.user,)
+                author=cls.user,
+                group=cls.group
+            )
 
     def test_first_page_contains_ten_records(self):
-        response = self.authorized_client.get(reverse('posts:index'))
+        response = self.client.get(reverse('posts:index'))
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_page_contains_three_records(self):
-        response = self.authorized_client.get(
-            reverse('posts:index') + '?page=2')
+        response = self.client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
-    def test_group_list_first_page_contains_ten_records(self):
-        response = self.authorized_client.get(reverse('posts:group_list'))
+    def test_group_first_page_contains_ten_records(self):
+        response = self.client.get(reverse(
+            'posts:group_list', kwargs={
+                'slug': PaginatorTests.group.slug
+            })
+        )
         self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_group_list_second_page_contains_three_records(self):
-        response = self.authorized_client.get(
-            reverse('posts:') + '?page=2')
+    def test_group_second_page_contains_three_records(self):
+        response = self.client.get(reverse(
+            'posts:group_list', kwargs={
+                'slug': PaginatorTests.group.slug
+            }) + '?page=2'
+        )
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_profile_first_page_contains_ten_records(self):
-        response = self.authorized_client.get(reverse('posts:profile'))
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={
+                'username': PaginatorTests.user.username,
+            })
+        )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_profile_second_page_contains_three_records(self):
-        response = self.authorized_client.get(
-            reverse('posts:profile') + '?page=2')
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={
+                'username': PaginatorTests.user.username,
+            }) + '?page=2'
+        )
         self.assertEqual(len(response.context['page_obj']), 3)

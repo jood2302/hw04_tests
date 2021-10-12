@@ -6,39 +6,26 @@ from posts.models import Post, Group
 User = get_user_model()
 
 
-class TestGroupModel(TestCase):
+class PostModelTest(TestCase):
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.group_title = 'Group_test'
+        cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
-            title=cls.group_title,
-            slug='Ntcn',
-            description='Тестовый текст.'
+            title='Тестовая группа',
+            slug='Тестовый слаг',
+            description='Тестовое описание',
         )
-
-    def test_object_name_is_title_group(cls):
-        group = Group.objects.all().first()
-        expected_object_name = group.title
-        cls.assertEqual(expected_object_name, str(cls.group_title),
-                        '__str__ работает неверно')
-
-
-class TestPostModel(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        user = User.objects.create(username='Test',
-                                   last_name='User',
-                                   email='test@user.net',
-                                   password='Test_User')
-        cls.task = Post.objects.create(
-            author=user,
+        cls.post = Post.objects.create(
+            author=cls.user,
             text='Тестовый текст',
         )
 
-    def test_object_text_long(self):
-        task = Post.objects.all().first()
-        expected_object_name = task.text[:15]
-        self.assertEqual(expected_object_name, str(task),
-                         'Не проходит по ограничению поста в 15 символов')
+    def test_models_have_correct_object_names(self):
+        group = PostModelTest.group
+        expected_title = group.title
+        self.assertEqual(expected_title, str(group))
+        post = PostModelTest.post
+        expected_object_name = post.text[:15]
+        self.assertEqual(expected_object_name, str(post))

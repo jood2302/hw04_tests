@@ -18,21 +18,21 @@ class PostFormTest(TestCase):
         super().setUpClass()
         settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
         cls.form = PostForm()
-        cls.user = User.objects.create_user(username='test_user')
+        cls.user = User.objects.create_user(username = 'test_user')
         cls.group = Group.objects.create(
-            title='Тест группа',
-            slug='testgroup',
-            description='Тест описание',
+            title = 'Тест группа',
+            slug = 'testgroup',
+            description = 'Тест описание',
         )
         cls.new_group = Group.objects.create(
-            title='Тест группа1',
-            slug='newtestgroup',
-            description='Тест группа',
+            title = 'Тест группа1',
+            slug = 'newtestgroup',
+            description = 'Тест группа',
         )
         cls.post = Post.objects.create(
-            text='Тестовый текст',
-            author=cls.user,
-            group=cls.group,
+            text = 'Тестовый текст',
+            author = cls.user,
+            group = cls.group,
         )
 
     @classmethod
@@ -61,7 +61,7 @@ class PostFormTest(TestCase):
                              reverse('posts:profile',
                                      kwargs={"username": "test_user"}))
         self.assertEqual(Post.objects.count(), posts_count + 1)
-        self.assertEqual(Post.objects.get(pk=2).text, 'New test text')
+        self.assertEqual(Post.objects.get(pk=2).text, 'Новый тест')
         self.assertEqual(Post.objects.get(pk=2).group.id, self.group.id)
         self.assertEqual(Post.objects.get(pk=2).author.username, "test_user")
 
