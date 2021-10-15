@@ -63,6 +63,7 @@ class PostFormTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_edit_post(self):
+        PostFormTest.post.refresh_from_db()
         form_data = {
             'text': 'Тест редактирования',
             'group': 1,
