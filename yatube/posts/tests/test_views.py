@@ -108,7 +108,7 @@ class TaskPagesTests(TestCase):
 
     def test_chech_post_in_index_and_profile(self):
         templates_pages_names = {reverse('posts:index'),
-            reverse('posts:profile', kwargs={'username': self.user.username}))
+                                reverse('posts:profile', kwargs={'username': self.user.username}))
         for reverse_name in templates_pages_names:
             response = self.authorized_client.get(
                 reverse_name)

@@ -24,7 +24,7 @@ class StaticURLTests(TestCase):
             text='Тестовый пост',
             group=cls.group,
         )
-    
+
     def setUp(self):
         self.client = Client()
         self.authorized_author = Client()
