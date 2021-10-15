@@ -43,7 +43,6 @@ class PostFormTest(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostFormTest.user)
-<<<<<<< HEAD
         self.guest_client = Client()
 
     def test_create_post(self):

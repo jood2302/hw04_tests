@@ -90,3 +90,4 @@ class StaticURLTests(TestCase):
         for reverse_name, template in url_templates_names.items():
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_author.get(reverse_name)
+                self.assertTemplateUsed(response, template)
