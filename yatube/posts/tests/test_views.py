@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -109,7 +108,7 @@ class TaskPagesTests(TestCase):
 
     def test_chech_post_in_index_and_profile(self):
         templates_pages_names = {reverse('posts:index'),
-            reverse('posts:profile', kwargs={'username': self.user.username}),}
+            reverse('posts:profile', kwargs={'username': self.user.username}))
         for reverse_name in templates_pages_names:
             response = self.authorized_client.get(
                 reverse_name)
@@ -118,7 +117,7 @@ class TaskPagesTests(TestCase):
             self.assertEqual(post_text, 'Тестовый текст')
             first_object = response.context['page_obj'][0]
             post_text = first_object.text
-            self.assertFalse(response.context['page_obj'].has_next()) 
+            self.assertFalse(response.context['page_obj'].has_next())
 
 
 class PaginatorTests(TestCase):
@@ -131,7 +130,6 @@ class PaginatorTests(TestCase):
             slug='test-slug',
             description='Тестовая группа',
         )
-
         cls.post = settings.POST_COUNT+3
         for cls.post in range(settings.POST_COUNT+3):
             cls.post = Post.objects.create(
@@ -142,7 +140,8 @@ class PaginatorTests(TestCase):
 
     def test_first_page_contains_ten_records(self):
         response = self.client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context['page_obj']), settings.POST_COUNT)
+        self.assertEqual(len(response.context['page_obj']), 
+                        settings.POST_COUNT)
 
     def test_second_page_contains_three_records(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
@@ -154,7 +153,8 @@ class PaginatorTests(TestCase):
                 'slug': PaginatorTests.group.slug
             })
         )
-        self.assertEqual(len(response.context['page_obj']), settings.POST_COUNT)
+        self.assertEqual(len(response.context['page_obj']), 
+                        settings.POST_COUNT)
 
     def test_group_second_page_contains_three_records(self):
         response = self.client.get(reverse(
@@ -170,7 +170,8 @@ class PaginatorTests(TestCase):
                 'username': PaginatorTests.user.username,
             })
         )
-        self.assertEqual(len(response.context['page_obj']), settings.POST_COUNT)
+        self.assertEqual(len(response.context['page_obj']),
+                        settings.POST_COUNT)
 
     def test_profile_second_page_contains_three_records(self):
         response = self.client.get(reverse(
