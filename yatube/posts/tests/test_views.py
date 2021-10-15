@@ -142,7 +142,7 @@ class PaginatorTests(TestCase):
     def test_first_page_contains_ten_records(self):
         response = self.client.get(reverse('posts:index'))
         self.assertEqual(len(response.context['page_obj']),
-                             settings.POST_COUNT)
+                            settings.POST_COUNT)
 
     def test_second_page_contains_three_records(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
