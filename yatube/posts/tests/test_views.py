@@ -108,7 +108,8 @@ class TaskPagesTests(TestCase):
 
     def test_chech_post_in_index_and_profile(self):
         templates_pages_names = {reverse('posts:index'),
-                                reverse('posts:profile', kwargs={'username': self.user.username}))
+                                 reverse('posts:profile', 
+                                 kwargs={'username': self.user.username}))
         for reverse_name in templates_pages_names:
             response = self.authorized_client.get(
                 reverse_name)
@@ -130,8 +131,8 @@ class PaginatorTests(TestCase):
             slug='test-slug',
             description='Тестовая группа',
         )
-        cls.post = settings.POST_COUNT+3
-        for cls.post in range(settings.POST_COUNT+3):
+        cls.post = settings.POST_COUNT + 3
+        for cls.post in range(settings.POST_COUNT + 3):
             cls.post = Post.objects.create(
                 text='Тестовый текст',
                 author=cls.user,
@@ -140,7 +141,7 @@ class PaginatorTests(TestCase):
 
     def test_first_page_contains_ten_records(self):
         response = self.client.get(reverse('posts:index'))
-        self.assertEqual(len(response.context['page_obj']), 
+        self.assertEqual(len(response.context['page_obj']),
                         settings.POST_COUNT)
 
     def test_second_page_contains_three_records(self):
@@ -153,8 +154,8 @@ class PaginatorTests(TestCase):
                 'slug': PaginatorTests.group.slug
             })
         )
-        self.assertEqual(len(response.context['page_obj']), 
-                        settings.POST_COUNT)
+        self.assertEqual(len(response.context['page_obj']),
+                                settings.POST_COUNT)
 
     def test_group_second_page_contains_three_records(self):
         response = self.client.get(reverse(
