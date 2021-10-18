@@ -57,7 +57,9 @@ class PostFormTest(TestCase):
             follow=True
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
-        self.assertEqual(Post.objects.get(id=PostFormTest.post.id).text, PostFormTest.post.text)
+        self.assertEqual(Post.objects.get(
+                                          id=PostFormTest.post.id).text,
+                                          PostFormTest.post.text)
         self.assertEqual(self.group, PostFormTest.post.group)
         self.assertEqual(self.post.author, PostFormTest.post.author)
         self.assertEqual(response.status_code, 200)
@@ -102,15 +104,18 @@ class PostFormTest(TestCase):
             )
         )
         self.assertEqual(Post.objects.count(), post_count)
+
+
 """Если выше это не тест создания поста от анонимного пользователя,
 тогда я не очень понимаю что это за условие.В задание написнао так:
 
 Тестирование Forms: «Unittest в Django: тестирование Forms»
 В проекте Yatube напишите тесты, которые проверяют, что
 
--при отправке валидной формы со страницы создания поста 
+-при отправке валидной формы со страницы создания поста
 reverse('posts:create_post') создаётся новая запись в базе данных;
 
--при отправке валидной формы со страницы редактирования поста 
-reverse('posts:post_edit', args=('post_id',)) происходит изменение поста с post_id в базе данных.
+-при отправке валидной формы со страницы редактирования поста
+reverse('posts:post_edit', args=('post_id',)) происходит
+изменение поста с post_id в базе данных.
 """
