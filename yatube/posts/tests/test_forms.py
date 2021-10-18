@@ -58,8 +58,8 @@ class PostFormTest(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertEqual(Post.objects.get(
-                                        id=PostFormTest.post.id).text,
-                                        PostFormTest.post.text)
+            id=PostFormTest.post.id).text,
+            PostFormTest.post.text)
         self.assertEqual(self.group, PostFormTest.post.group)
         self.assertEqual(self.post.author, PostFormTest.post.author)
         self.assertEqual(response.status_code, 200)
