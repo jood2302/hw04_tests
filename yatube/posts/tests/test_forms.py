@@ -34,6 +34,10 @@ class PostFormTest(TestCase):
             author=cls.user,
             group=cls.group,
         )
+        cls.form_data = {
+            'text': 'Тестовый заголовок',
+            'group': 1,
+        }
 
     @classmethod
     def tearDownClass(cls):
@@ -43,46 +47,70 @@ class PostFormTest(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostFormTest.user)
+        self.guest_client = Client()
 
     def test_create_post(self):
-        posts_count = Post.objects.count()
-        post_data = {
-            'text': 'Новый тест',
-            'group': PostFormTest.group.id,
-        }
-
+        post_count = Post.objects.count()
         response = self.authorized_client.post(
             reverse('posts:post_create'),
-            data=post_data,
-            follow=True,
+            data=PostFormTest.form_data,
+            follow=True
         )
-
-        self.assertRedirects(response,
-                             reverse('posts:profile',
-                                     kwargs={"username": "test_user"}))
-        self.assertEqual(Post.objects.count(), posts_count + 1)
-        self.assertEqual(Post.objects.get(pk=2).text, 'Новый тест')
-        self.assertEqual(Post.objects.get(pk=2).group.id, self.group.id)
-        self.assertEqual(Post.objects.get(pk=2).author.username, "test_user")
+        self.assertEqual(Post.objects.count(), post_count + 1)
+        self.assertEqual(Post.objects.get(id=PostFormTest.post.id).text, PostFormTest.post.text)
+        self.assertEqual(self.group, PostFormTest.post.group)
+        self.assertEqual(self.post.author, PostFormTest.post.author)
+        self.assertEqual(response.status_code, 200)
 
     def test_edit_post(self):
-        post_id = PostFormTest.post.id
-        post_data = {
-            'text': 'Новый тест',
-            'group': PostFormTest.new_group.id,
-        }
-        kwargs_post = {
-            'post_id': post_id,
-        }
-
+        PostFormTest.post.refresh_from_db()
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs=kwargs_post),
-            data=post_data,
-            follow=True,
+            reverse('posts:post_edit', kwargs={
+                'post_id': PostFormTest.post.pk}),
+            data=PostFormTest.form_data,
+            follow=True
         )
+        self.assertTrue(
+            Post.objects.filter(
+                text=PostFormTest.form_data['text']
+            ).exists()
+        )
+        PostFormTest.post.refresh_from_db()
+        self.assertTrue(
+            Post.objects.filter(
+                group=self.group
+            ).exists()
+        )
+        self.assertTrue(
+            Post.objects.filter(
+                id=PostFormTest.post.pk
+            )
+        )
+        self.assertEqual(response.status_code, 200)
 
-        self.assertRedirects(response,
-                             reverse('posts:post_detail', kwargs=kwargs_post))
-        self.assertEqual(Post.objects.get(id=post_id).text, post_data['text'])
-        self.assertEqual(Post.objects.get(id=post_id).group.id,
-                         post_data['group'])
+    def test_anonim_client_create_post(self):
+        post_count = Post.objects.count()
+        response = self.client.post(
+            reverse('posts:post_create'),
+            data=PostFormTest.form_data,
+            follow=True
+        )
+        self.assertEqual(Post.objects.count(), post_count)
+        self.assertRedirects(
+            response, reverse('users:login') + '?next=' + reverse(
+                'posts:post_create'
+            )
+        )
+        self.assertEqual(Post.objects.count(), post_count)
+"""Если выше это не тест создания поста от анонимного пользователя,
+тогда я не очень понимаю что это за условие.В задание написнао так:
+
+Тестирование Forms: «Unittest в Django: тестирование Forms»
+В проекте Yatube напишите тесты, которые проверяют, что
+
+-при отправке валидной формы со страницы создания поста 
+reverse('posts:create_post') создаётся новая запись в базе данных;
+
+-при отправке валидной формы со страницы редактирования поста 
+reverse('posts:post_edit', args=('post_id',)) происходит изменение поста с post_id в базе данных.
+"""
