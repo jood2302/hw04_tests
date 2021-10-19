@@ -61,9 +61,12 @@ class PostFormTest(TestCase):
             follow=True
         )
         post_last = Post.objects.order_by('-id')[0]
-        self.assertRedirects(response, 
-            reverse('posts:profile', kwargs={
-                'username': PostFormTest.user}))
+        self.assertRedirects(response,
+            reverse('posts:profile', 
+            kwargs={
+                'username': PostFormTest.user}
+            )
+        )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertEqual(post_last.text, context['text'])
         self.assertEqual(post_last.group, PostFormTest.group)
@@ -80,7 +83,7 @@ class PostFormTest(TestCase):
                 'post_id': PostFormTest.post.id}),
             data=context,
             follow=True
-        )
+            )
         PostFormTest.post.refresh_from_db()
         self.assertRedirects(response, reverse(
             'posts:post_detail', kwargs={'post_id': PostFormTest.post.id}))
@@ -94,7 +97,7 @@ class PostFormTest(TestCase):
             reverse('posts:post_create'),
             data=PostFormTest.form_data,
             follow=True
-        )
+            )
         self.assertEqual(Post.objects.count(), post_count)
         self.assertRedirects(response, 
             reverse('users:login') + '?next=' + reverse(
