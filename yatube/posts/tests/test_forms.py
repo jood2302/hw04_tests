@@ -64,9 +64,7 @@ class PostFormTest(TestCase):
         self.assertRedirects(response,
                              reverse('posts:profile',
                                      kwargs={
-                                     'username': PostFormTest.user}
-                                    )
-                            )
+                                             'username': PostFormTest.user}))
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertEqual(post_last.text, context['text'])
         self.assertEqual(post_last.group, PostFormTest.group)
@@ -100,8 +98,8 @@ class PostFormTest(TestCase):
         )
         self.assertEqual(Post.objects.count(), post_count)
         self.assertRedirects(response,
-            reverse('users:login') + '?next=' + reverse(
-                'posts:post_create'))
+                             reverse('users:login') + '?next=' + reverse(
+                                     'posts:post_create'))
         self.assertEqual(Post.objects.count(), post_count)
 
     def test_anonim_edit_post(self):
