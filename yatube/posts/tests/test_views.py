@@ -23,7 +23,7 @@ class TaskPagesTests(TestCase):
             group=self.group
         )
         self.form_data = {
-            'text': 'Тестовый текст',
+            'text': self.post.text,
             'group': self.group.id,
         }
         self.new_post = self.authorized_client.post(
@@ -42,15 +42,15 @@ class TaskPagesTests(TestCase):
         templates_pages_names = {
             self.public_index_template: reverse('posts:index'),
             self.public_profile: reverse('posts:profile',
-                                         kwargs={'username': 'test_user'}),
+                                         kwargs={'username': self.user}),
             self.public_post: reverse('posts:post_detail',
-                                      kwargs={'post_id': '1'}),
+                                      kwargs={'post_id': self.post.id}),
             self.private_edit_post_template: reverse('posts:post_edit',
                                                      kwargs={'post_id':
-                                                             '1'}),
+                                                             self.post.id}),
             self.private_create_post_template: reverse('posts:post_create'),
             self.public_group_page_template: (
-                reverse('posts:group_list', kwargs={'slug': '12'})
+                reverse('posts:group_list', kwargs={'slug': self.group.slug})
             ),
         }
         for template, reverse_name in templates_pages_names.items():
@@ -62,9 +62,9 @@ class TaskPagesTests(TestCase):
 
     def test_context(self):
         url_names = [reverse('posts:index'),
-                     reverse('posts:post_detail', kwargs={'post_id': '2'}),
+                     reverse('posts:post_detail', kwargs={'post_id': self.post.id}),
                      reverse('posts:post_edit',
-                             kwargs={'post_id': '2'}),
+                             kwargs={'post_id': self.post.id}),
                      reverse('posts:group_list',
                              kwargs={'slug': self.group.slug}),
                      reverse('posts:profile',
@@ -74,6 +74,7 @@ class TaskPagesTests(TestCase):
             self.assertContains(response, self.form_data['text'])
             self.assertContains(response, self.user)
             self.assertContains(response, self.group.id)
+            self.assertContains(response, self.post.id)
 
     def test_check_post_in_group(self):
         t_group = Group.objects.create(
@@ -92,17 +93,17 @@ class TaskPagesTests(TestCase):
             group=t_group,
         )
         response = self.authorized_client.get(
-            reverse('posts:group_list', kwargs={'slug': 'test'}))
-        self.assertEqual(response.context['group'].title, 'Заголовок')
-        self.assertEqual(response.context['group'].slug, 'test')
-        self.assertEqual(response.context['group'].description, 'Текст')
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}))
+        self.assertEqual(response.context['group'].title, self.group.title)
+        self.assertEqual(response.context['group'].slug, self.group.slug)
+        self.assertEqual(response.context['group'].description, self.group.description)
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
         post_group = first_object.group
-        self.assertEqual(post_text, 'Тестовый текст')
-        self.assertEqual(post_group.title, 'Заголовок')
+        self.assertEqual(post_text, self.post.text)
+        self.assertEqual(post_group.title, self.group.title)
         response = self.authorized_client.get(
-            reverse('posts:group_list', kwargs={'slug': 'test1'})
+            reverse('posts:group_list', kwargs={'slug': self.group.slug})
         )
         self.assertFalse(response.context['page_obj'].has_next())
 
@@ -115,7 +116,7 @@ class TaskPagesTests(TestCase):
                 reverse_name)
             first_object = response.context['page_obj'][0]
             post_text = first_object.text
-            self.assertEqual(post_text, 'Тестовый текст')
+            self.assertEqual(post_text, self.post.text)
             first_object = response.context['page_obj'][0]
             post_text = first_object.text
             self.assertFalse(response.context['page_obj'].has_next())
