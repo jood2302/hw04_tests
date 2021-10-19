@@ -26,7 +26,6 @@ class StaticURLTests(TestCase):
         )
 
     def setUp(self):
-        self.client = Client()
         self.authorized_author = Client()
         self.authorized_author.force_login(self.author)
         self.authorized_user = Client()

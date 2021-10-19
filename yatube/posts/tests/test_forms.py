@@ -34,6 +34,10 @@ class PostFormTest(TestCase):
             author=cls.user,
             group=cls.group,
         )
+        cls.form_data = {
+            'text': 'Тестовый заголовок',
+            'group': 1,
+        }
 
     @classmethod
     def tearDownClass(cls):
@@ -47,38 +51,31 @@ class PostFormTest(TestCase):
 
     def test_create_post(self):
         post_count = Post.objects.count()
-        form_data = {
-            'text': 'Тестовый заголовок',
-            'group': 1,
-        }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
-            data=form_data,
+            data=PostFormTest.form_data,
             follow=True
         )
         self.assertEqual(Post.objects.count(), post_count + 1)
-        self.assertEqual(self.post.text, PostFormTest.post.text)
+        self.assertEqual(Post.objects.get(id=PostFormTest.post.id).text, PostFormTest.post.text)
         self.assertEqual(self.group, PostFormTest.post.group)
         self.assertEqual(self.post.author, PostFormTest.post.author)
         self.assertEqual(response.status_code, 200)
 
     def test_edit_post(self):
         PostFormTest.post.refresh_from_db()
-        form_data = {
-            'text': 'Тест редактирования',
-            'group': 1,
-        }
         response = self.authorized_client.post(
             reverse('posts:post_edit', kwargs={
                 'post_id': PostFormTest.post.pk}),
-            data=form_data,
+            data=PostFormTest.form_data,
             follow=True
         )
         self.assertTrue(
             Post.objects.filter(
-                text=form_data['text']
+                text=PostFormTest.form_data['text']
             ).exists()
         )
+        PostFormTest.post.refresh_from_db()
         self.assertTrue(
             Post.objects.filter(
                 group=self.group
@@ -93,13 +90,9 @@ class PostFormTest(TestCase):
 
     def test_guest_client_create_post(self):
         post_count = Post.objects.count()
-        form_data = {
-            'text': 'Редактирования',
-            'group': 1,
-        }
-        response = self.guest_client.post(
+        response = self.client.post(
             reverse('posts:post_create'),
-            data=form_data,
+            data=PostFormTest.form_data,
             follow=True
         )
         self.assertEqual(Post.objects.count(), post_count)
@@ -108,3 +101,4 @@ class PostFormTest(TestCase):
                 'posts:post_create'
             )
         )
+        self.assertEqual(Post.objects.count(), post_count)
