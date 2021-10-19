@@ -62,7 +62,8 @@ class TaskPagesTests(TestCase):
 
     def test_context(self):
         url_names = [reverse('posts:index'),
-                     reverse('posts:post_detail', kwargs={'post_id': self.post.id}),
+                     reverse('posts:post_detail',
+                             kwargs={'post_id': self.post.id}),
                      reverse('posts:post_edit',
                              kwargs={'post_id': self.post.id}),
                      reverse('posts:group_list',
@@ -96,7 +97,8 @@ class TaskPagesTests(TestCase):
             reverse('posts:group_list', kwargs={'slug': self.group.slug}))
         self.assertEqual(response.context['group'].title, self.group.title)
         self.assertEqual(response.context['group'].slug, self.group.slug)
-        self.assertEqual(response.context['group'].description, self.group.description)
+        self.assertEqual(response.context['group'].description,
+                         self.group.description)
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
         post_group = first_object.group
