@@ -62,11 +62,11 @@ class PostFormTest(TestCase):
         )
         post_last = Post.objects.order_by('-id')[0]
         self.assertRedirects(response,
-            reverse('posts:profile',
-                     kwargs={
-                             'username': PostFormTest.user}
-            )
-        )
+                             reverse('posts:profile',
+                                     kwargs={
+                                     'username': PostFormTest.user}
+                                    )
+                            )
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertEqual(post_last.text, context['text'])
         self.assertEqual(post_last.group, PostFormTest.group)
