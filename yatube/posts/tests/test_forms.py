@@ -24,11 +24,6 @@ class PostFormTest(TestCase):
             slug='testgroup',
             description='Тест описание',
         )
-        cls.new_group = Group.objects.create(
-            title='Тест группа1',
-            slug='newtestgroup',
-            description='Тест группа',
-        )
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=cls.user,
@@ -53,7 +48,7 @@ class PostFormTest(TestCase):
         post_count = Post.objects.count()
         context = {
             'text': 'Текстовый текст',
-            'group': PostFormTest.group.id
+            'group': PostFormTest.group.id,
         }
         response = self.authorized_client.post(
             reverse('posts:post_create'),
@@ -67,7 +62,7 @@ class PostFormTest(TestCase):
                                          'username': PostFormTest.user}))
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertEqual(post_last.text, context['text'])
-        self.assertEqual(post_last.group, PostFormTest.group)
+        self.assertEqual(post_last.group.id, context['group'])
         self.assertEqual(response.status_code, 200)
 
     def test_edit_post(self):
@@ -103,17 +98,17 @@ class PostFormTest(TestCase):
         self.assertEqual(Post.objects.count(), post_count)
 
     def test_anonim_edit_post(self):
-        post_count = Post.objects.count()
+        context = {
+            'text': 'Попытка изменить пост',
+            'group': ''
+        }
         response = self.client.post(
-            reverse('posts:post_edit', kwargs={
-                'post_id': PostFormTest.post.pk}),
-            data=PostFormTest.form_data,
+            reverse('posts:post_edit', kwargs={'post_id': PostFormTest.post.id}),
+            data=context,
             follow=True
         )
-        self.assertEqual(Post.objects.count(), post_count)
-        self.assertRedirects(
-            response, reverse('users:login') + '?next=' + reverse(
-                'posts:post_edit', kwargs={
-                    'post_id': PostFormTest.post.pk})
-        )
-        self.assertEqual(Post.objects.count(), post_count)
+        self.assertRedirects(response, reverse(
+            'users:login') + '?next=' + reverse(
+                'posts:post_edit', kwargs={'post_id': PostFormTest.post.id}))
+        self.assertNotEqual(PostFormTest.post.text, context['text'])
+        self.assertNotEqual(PostFormTest.post.group.title, None)
