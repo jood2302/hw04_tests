@@ -103,7 +103,8 @@ class PostFormTest(TestCase):
             'group': ''
         }
         response = self.client.post(
-            reverse('posts:post_edit', kwargs={'post_id': PostFormTest.post.id}),
+            reverse('posts:post_edit', kwargs={
+                'post_id': PostFormTest.post.id}),
             data=context,
             follow=True
         )
